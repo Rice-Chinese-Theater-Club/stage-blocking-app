@@ -113,7 +113,7 @@ export async function syncAllImagesToGitHub() {
 
         try {
             const content = data.base64.split(',')[1];
-            const githubPath = `01_电子走位本/走位图/library/${key}.png`;
+            const githubPath = `走位图/library/${key}.png`;
 
             // 检查文件是否已存在
             let sha = null;
@@ -228,7 +228,7 @@ export async function uploadToLibrary(files, names = []) {
 
             // 生成唯一 key
             const imageKey = generateImageKey(customName);
-            const path = `01_电子走位本/走位图/library/${imageKey}.png`;
+            const path = `走位图/library/${imageKey}.png`;
 
             // 上传到 GitHub
             const response = await fetch(

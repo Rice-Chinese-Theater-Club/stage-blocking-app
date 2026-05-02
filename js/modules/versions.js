@@ -219,7 +219,7 @@ export function openConfigActorsModal() {
     header.textContent = `配置场次演员 - ${sceneObj.id} ${sceneObj.name}`;
 
     const sceneLines = BlockingApp.data.lines.filter(line => line.sceneId === window.currentScene.id && !line.isStageDirection);
-    // 解析合台词角色（如 "钰、时、程" -> ["钰", "时", "程"]）
+    // 解析合台词角色（如 "A、B、C" -> ["A", "B", "C"]）
     const charactersWithLinesSet = new Set();
     sceneLines.forEach(line => {
         parseCharacterNames(line.character).forEach(c => charactersWithLinesSet.add(c));

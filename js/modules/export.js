@@ -318,7 +318,7 @@ function generateCoverHTML(selectedScenes) {
 
     return `
         <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px;">
-            <div style="font-size: 56px; font-weight: bold; color: #333; margin-bottom: 20px;">乱民全讲</div>
+            <div style="font-size: 56px; font-weight: bold; color: #333; margin-bottom: 20px;">XXXX</div>
             <div style="font-size: 32px; color: #666; margin-bottom: 40px;">电子走位本</div>
             <div style="font-size: 18px; color: #888; margin-bottom: 60px;">${date}</div>
             <div style="width: 80%; text-align: left; border-top: 2px solid #ddd; padding-top: 30px;">

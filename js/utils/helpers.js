@@ -221,7 +221,7 @@ export function getCharacterByName(characters, charName) {
     return characters.find(c => c.name === charName);
 }
 
-// 解析角色名（处理合台词如 "钰、时、程" -> ["钰", "时", "程"]）
+// 解析角色名（处理合台词如 "A、B、C" -> ["A", "B", "C"]）
 // 过滤掉"众"角色，走位功能不需要
 export function parseCharacterNames(charString) {
     if (!charString) return [];

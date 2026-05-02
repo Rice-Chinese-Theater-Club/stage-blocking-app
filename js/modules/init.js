@@ -207,17 +207,17 @@ export async function loadStageImages() {
     // 图片库列表（所有可用的走位图）
     const libraryImages = [
         { key: 'default_blank', name: '默认-空白', path: '走位图/默认-空白.png' },
-        { key: 'identity_1p_v1', name: '身份-1人-v1', path: '走位图/身份-1人-v1.png' },
-        { key: 'identity_1p_v2', name: '身份-1人-v2', path: '走位图/身份-1人-v2.png' },
-        { key: 'identity_4p_v1', name: '身份-4人-v1', path: '走位图/身份-4人-v1.png' },
-        { key: 'identity_4p_v2', name: '身份-4人-v2', path: '走位图/身份-4人-v2.png' },
-        { key: 'xiaolin', name: '小林', path: '走位图/小林.png' },
-        { key: 'democracy', name: '民主化', path: '走位图/民主化.png' },
-        { key: 'airplane', name: '飞机', path: '走位图/飞机.png' },
-        { key: 'ktv', name: 'KTV', path: '走位图/KTV.png' },
-        { key: 'deep_travel_v1', name: '深度旅游v1', path: '走位图/深度旅游v1.png' },
-        { key: 'deep_travel_v2', name: '深度旅游v2', path: '走位图/深度旅游v2.png' },
-        { key: 'sweet_sour_bitter_spicy', name: '酸甜苦辣', path: '走位图/酸甜苦辣.png' }
+        { key: 'identity_1p_v1', name: 'layout_1', path: '走位图/layout_1.png' },
+        { key: 'identity_1p_v2', name: 'layout_2', path: '走位图/layout_2.png' },
+        { key: 'identity_4p_v1', name: 'layout_3', path: '走位图/layout_3.png' },
+        { key: 'identity_4p_v2', name: 'layout_4', path: '走位图/layout_4.png' },
+        { key: 'xiaolin', name: 'layout_5', path: '走位图/layout_5.png' },
+        { key: 'democracy', name: 'layout_6', path: '走位图/layout_6.png' },
+        { key: 'airplane', name: 'layout_7', path: '走位图/layout_7.png' },
+        { key: 'ktv', name: 'layout_8', path: '走位图/layout_8.png' },
+        { key: 'deep_travel_v1', name: 'layout_9', path: '走位图/layout_9.png' },
+        { key: 'deep_travel_v2', name: 'layout_10', path: '走位图/layout_10.png' },
+        { key: 'sweet_sour_bitter_spicy', name: 'layout_11', path: '走位图/layout_11.png' }
     ];
 
     // 加载默认幕图
