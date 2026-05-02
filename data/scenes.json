@@ -1,0 +1,44 @@
+[
+  {
+    "id": "1-1",
+    "name": "Scene 1-1",
+    "subtitle": "",
+    "stageMap": "act1/stage.png",
+    "characters": []
+  },
+  {
+    "id": "1-2",
+    "name": "Scene 1-2",
+    "subtitle": "",
+    "stageMap": "act1/stage.png",
+    "characters": []
+  },
+  {
+    "id": "1-3",
+    "name": "Scene 1-3",
+    "subtitle": "",
+    "stageMap": "act1/stage.png",
+    "characters": []
+  },
+  {
+    "id": "2-1",
+    "name": "Scene 2-1",
+    "subtitle": "",
+    "stageMap": "act2/stage.png",
+    "characters": []
+  },
+  {
+    "id": "2-2",
+    "name": "Scene 2-2",
+    "subtitle": "",
+    "stageMap": "act2/stage.png",
+    "characters": []
+  },
+  {
+    "id": "2-3",
+    "name": "Scene 2-3",
+    "subtitle": "",
+    "stageMap": "act2/stage.png",
+    "characters": []
+  }
+]

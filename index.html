@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>电子走位本 - 乱民全讲 v4.6</title>
+    <link rel="stylesheet" href="styles.css?v=4.6">
+
+    <!-- Firebase SDK (v8 compat) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <!-- jsPDF and html2canvas for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部工具栏 -->
+        <div class="toolbar">
+            <h1>电子走位本</h1>
+            <span class="save-status" id="saveStatus">已保存</span>
+            <button id="undoBtn" class="undo-btn" onclick="undo()" disabled title="撤销">撤销</button>
+            <select id="sceneSelect">
+                <option value="">加载中...</option>
+            </select>
+
+            <!-- 状态栏 -->
+            <div class="scene-stats" id="sceneStats">
+                <span class="stat-item">角色: <span id="statActors">-/-</span></span>
+                <span class="stat-item">走位: <span id="statMovements">-</span></span>
+                <span class="stat-item">备注: <span id="statNotes">-</span></span>
+            </div>
+
+            <!-- 视图切换 -->
+            <div class="view-toggle">
+                <button id="linesViewBtn" class="active" onclick="switchView('lines')">台词视图</button>
+                <button id="charactersViewBtn" onclick="switchView('characters')">角色视图</button>
+            </div>
+
+            <!-- 模式切换（仅台词视图显示）-->
+            <div class="mode-toggle" id="modeToggle">
+                <button id="blockingModeBtn" class="active" onclick="switchMode('blocking')">走位</button>
+                <button id="noteModeBtn" onclick="switchMode('note')">备注</button>
+            </div>
+
+            <!-- 初始设置下拉 -->
+            <div class="dropdown">
+                <button class="dropdown-btn">初始设置 ▾</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="event.preventDefault(); openConfigActorsModal()">配置演员</a>
+                    <a href="#" onclick="event.preventDefault(); startSetInitial()">设置初始位置</a>
+                    <a href="#" onclick="event.preventDefault(); showStageImageManager()">管理舞台图</a>
+                </div>
+            </div>
+
+            <!-- 版本控制下拉 -->
+            <div class="dropdown">
+                <button class="dropdown-btn">版本控制 ▾</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="event.preventDefault(); openSaveVersionModal()">保存版本</a>
+                    <a href="#" onclick="event.preventDefault(); toggleVersionHistory()">版本历史</a>
+                    <a href="#" onclick="event.preventDefault(); openExportPDFModal()">导出PDF</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容 -->
+        <div class="main-content">
+            <!-- 左侧面板 -->
+            <div class="left-panel">
+                <div class="panel-header">
+                </div>
+                <div class="panel-content" id="panelContent">
+                    <div class="loading">加载数据</div>
+                </div>
+                <!-- 走位列表面板（仅在角色视图显示） -->
+                <div class="movements-panel" id="movementsPanel" style="display: none;">
+                    <div id="movementsListContainer"></div>
+                </div>
+            </div>
+
+            <!-- 右侧走位图 -->
+            <div class="stage-panel">
+                <div class="stage-position-display" id="stagePositionDisplay">
+                    <span class="position-label">当前位置：</span>
+                    <span class="position-content" id="positionContent">开场</span>
+                </div>
+                <!-- 多选工具栏 -->
+                <div class="multi-select-toolbar" id="multiSelectToolbar">
+                    <button id="coordinateAdjustBtn" onclick="toggleCoordinateAdjustMode()">坐标调整</button>
+                    <button id="multiSelectBtn" onclick="toggleMultiSelectMode()" disabled style="opacity: 0.5;">多选模式</button>
+                    <button id="clearSelectionBtn" onclick="clearMarkerSelection()" disabled>清除选择</button>
+                    <span class="selection-count" id="selectionCount">已选择: 0</span>
+                    <!-- 缩放控制器 -->
+                    <div class="zoom-controls">
+                        <button onclick="zoomStage(-0.1)" title="缩小">-</button>
+                        <span class="zoom-value" id="zoomValue">100%</span>
+                        <button onclick="zoomStage(0.1)" title="放大">+</button>
+                        <button onclick="resetZoom()" title="重置" style="font-size: 12px; width: auto; padding: 0 8px;">重置</button>
+                    </div>
+                </div>
+                <div class="stage-container" id="stageContainer">
+                    <div class="stage-wrapper" id="stageWrapper">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 状态栏 -->
+        <div class="status-bar" id="statusBar"></div>
+    </div>
+
+    <!-- 角色选择模态框 -->
+    <div class="modal" id="characterModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalHeader">选择演员</div>
+            <div class="character-grid" id="characterGrid"></div>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeCharacterModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 版本更新提示模态框 -->
+    <div class="modal" id="onboardingModal">
+        <div class="modal-content">
+            <div class="onboarding-step">
+                <h2>v4.6 版本更新</h2>
+                <div style="text-align: left; line-height: 1.8; margin: 15px 0;">
+                    <p><strong>新功能：</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><b>台词视图走位点可交互</b> - 拖拽、多选、删除</li>
+                        <li><b>撤销功能</b> - 支持撤销走位操作</li>
+                        <li><b>边界框缩放</b> - 多选后拖拽控制点批量缩放</li>
+                        <li><b>舞台图管理</b> - 图片库 + 场次配置</li>
+                        <li><b>坐标调整模式</b> - 区分添加走位和调整走位</li>
+                        <li><b>走位图缩放</b> - 支持放大/缩小查看</li>
+                    </ul>
+                    <p><strong>优化：</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>PDF直接下载到本地</li>
+                        <li>走位标记缩小，显示更清晰</li>
+                    </ul>
+                </div>
+                <div class="modal-buttons" style="justify-content: center;">
+                    <button class="confirm" onclick="closeOnboarding()">知道了</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存版本模态框 -->
+    <div class="modal" id="saveVersionModal">
+        <div class="modal-content">
+            <div class="modal-header">保存版本快照</div>
+            <div class="github-config">
+                <label>版本名称</label>
+                <input type="text" id="versionName" placeholder="例如: 第一次排练">
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeSaveVersionModal()">取消</button>
+                <button class="confirm" onclick="saveVersion()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 配置演员模态框 -->
+    <div class="modal" id="configActorsModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header" id="configActorsHeader">配置场次演员</div>
+            <div class="config-actors-info">
+                <p>请选择本场次所有在场的演员（包括无台词但在场的演员）</p>
+            </div>
+            <div class="actors-checklist" id="actorsChecklist">
+                <!-- 演员复选框列表将动态生成 -->
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeConfigActorsModal()">取消</button>
+                <button class="confirm" onclick="saveActorsConfig()">保存配置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 台词关联模态框 -->
+    <div class="modal line-association-modal" id="lineAssociationModal">
+        <div class="modal-content">
+            <div class="modal-header">关联到台词</div>
+            <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                选择要关联的台词（点击即可选中）
+            </p>
+            <div class="line-list" id="lineList">
+                <!-- 台词列表将动态生成 -->
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeLineAssociationModal()">取消</button>
+                <button class="confirm" onclick="confirmLineAssociation()">下一步：选择字符</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 字符位置选择模态框 -->
+    <div class="modal" id="characterPositionModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">选择具体字符位置</div>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                点击台词中的任意字符来精确指定位置
+            </p>
+            <div class="selected-line-display">
+                <div class="line-character" id="charPosLineCharacter"></div>
+                <div class="line-content selectable-chars" id="selectedLineContent">
+                    <!-- 动态显示可点击的台词字符 -->
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeCharacterPositionModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 备注输入模态框 -->
+    <div class="modal" id="noteInputModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">添加备注</div>
+            <div class="note-line-preview">
+                <p style="font-size: 12px; color: #888; margin-bottom: 8px;">选中位置：</p>
+                <div id="noteCharDisplay" class="note-char-display"></div>
+            </div>
+            <div class="note-form">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px;">谁的动作：</label>
+                    <select id="noteCharacterSelect" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></select>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px;">常用动作：</label>
+                    <div class="common-actions-chips" id="commonActionsContainer"></div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px;">舞台方位（可选）：</label>
+                    <div class="stage-direction-container" id="stageDirectionContainer"></div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px;">备注内容：</label>
+                    <div class="note-input-wrapper">
+                        <input type="text" id="noteInput" placeholder="如：站起、坐下、指向USL..."
+                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                        <button class="add-common-note-btn" onclick="addCurrentActionToCommon('noteInput')" title="添加到常用动作">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeNoteInputModal()">取消</button>
+                <button class="confirm" onclick="saveNote()">保存</button>
+            </div>
+        </div>
+    </div>
+    <div id="noteLineDisplay" style="display: none;"></div>
+
+    <!-- 走位备注模态框 -->
+    <div class="modal" id="movementNoteModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">走位备注</div>
+            <div class="note-form">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px;">常用动作：</label>
+                    <div class="common-actions-chips" id="movementCommonActionsContainer"></div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px;">舞台方位（可选）：</label>
+                    <div class="stage-direction-container" id="movementStageDirectionContainer"></div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; margin-bottom: 4px; font-size: 13px;">备注内容：</label>
+                    <div class="note-input-wrapper">
+                        <input type="text" id="movementNoteInput" placeholder="如：走向USL、从DSR缓慢走入..."
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                        <button class="add-common-note-btn" onclick="addCurrentActionToCommon('movementNoteInput')" title="添加到常用动作">+</button>
+                    </div>
+                </div>
+                <p style="font-size: 12px; color: #888;">添加对这个走位点的说明，如走位路线、节奏等</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeMovementNoteModal()">取消</button>
+                <button class="confirm" onclick="saveMovementNote()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 版本历史侧边栏 -->
+    <div class="version-sidebar" id="versionSidebar">
+        <div class="version-sidebar-header">
+            <h3>版本历史</h3>
+            <button onclick="toggleVersionHistory()">×</button>
+        </div>
+        <div class="version-list" id="versionList">
+            <div class="loading">加载中...</div>
+        </div>
+    </div>
+
+    <!-- PDF导出场次选择模态框 -->
+    <div class="modal" id="exportPDFModal">
+        <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+            <div class="modal-header">导出走位本PDF</div>
+            <div class="config-actors-info">
+                <p>请选择要导出的场次</p>
+            </div>
+            <div class="modal-buttons" style="margin-bottom: 15px;">
+                <button onclick="selectAllScenes()">全选</button>
+                <button onclick="deselectAllScenes()">清空</button>
+            </div>
+            <div class="actors-checklist" id="scenesChecklist" style="max-height: 400px; overflow-y: auto;">
+                <!-- 场次复选框列表将动态生成 -->
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeExportPDFModal()">取消</button>
+                <button class="confirm" onclick="generatePDF()">导出PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 舞台图管理模态框 -->
+    <div class="modal" id="stageImageModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">舞台图管理</div>
+            <div class="config-actors-info">
+                <p>每一幕对应一张舞台图，上传后将同步到 GitHub 仓库</p>
+            </div>
+            <div class="stage-image-grid" id="stageImageGrid">
+                <!-- 动态生成 -->
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel" onclick="closeStageImageManager()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模块化 JavaScript -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

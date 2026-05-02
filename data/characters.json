@@ -1,0 +1,74 @@
+[
+  {
+    "id": "a",
+    "name": "A",
+    "fullName": "Character A",
+    "color": "#fde2e4"
+  },
+  {
+    "id": "b",
+    "name": "B",
+    "fullName": "Character B",
+    "color": "#c5dedd"
+  },
+  {
+    "id": "c",
+    "name": "C",
+    "fullName": "Character C",
+    "color": "#bcd4e6"
+  },
+  {
+    "id": "d",
+    "name": "D",
+    "fullName": "Character D",
+    "color": "#fff1e6"
+  },
+  {
+    "id": "e",
+    "name": "E",
+    "fullName": "Character E",
+    "color": "#dbe7e4"
+  },
+  {
+    "id": "f",
+    "name": "F",
+    "fullName": "Character F",
+    "color": "#eddcd2"
+  },
+  {
+    "id": "g",
+    "name": "G",
+    "fullName": "Character G",
+    "color": "#e8d5b7"
+  },
+  {
+    "id": "h",
+    "name": "H",
+    "fullName": "Character H",
+    "color": "#d6e2e9"
+  },
+  {
+    "id": "i",
+    "name": "I",
+    "fullName": "Character I",
+    "color": "#d4c4fb"
+  },
+  {
+    "id": "j",
+    "name": "J",
+    "fullName": "Character J",
+    "color": "#99c1de"
+  },
+  {
+    "id": "k",
+    "name": "K",
+    "fullName": "Character K",
+    "color": "#f0efeb"
+  },
+  {
+    "id": "l",
+    "name": "L",
+    "fullName": "Character L",
+    "color": "#fad2e1"
+  }
+]

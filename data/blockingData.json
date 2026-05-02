@@ -1,0 +1,36 @@
+{
+  "1-2": {
+    "A": {
+      "initial": {
+        "x": 50.00,
+        "y": 40.00
+      },
+      "movements": [
+        {
+          "lineId": "1-2-4",
+          "charIndex": 3,
+          "x": 30.00,
+          "y": 55.00,
+          "timestamp": 1700000000000,
+          "type": "line"
+        }
+      ]
+    },
+    "B": {
+      "initial": {
+        "x": 70.00,
+        "y": 35.00
+      },
+      "movements": [
+        {
+          "lineId": "1-2-5",
+          "charIndex": 2,
+          "x": 60.00,
+          "y": 50.00,
+          "timestamp": 1700000001000,
+          "type": "line"
+        }
+      ]
+    }
+  }
+}
