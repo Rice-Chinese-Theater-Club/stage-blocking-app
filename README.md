@@ -1,54 +1,190 @@
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-# Online Stage Blocking Notes
+# Stage Blocking App
 
-## Introduction
-
-Online Stage Blocking Notes is a web-based system for recording stage blocking in theater productions. It allows directors and stage managers to mark actor positions in real-time during rehearsals, edit dialogue, add notes, and sync across multiple users via Firebase.
+A web-based system for recording stage blocking in theater productions. Directors and stage managers can mark actor positions during rehearsals, edit dialogue, add notes, and optionally sync across multiple users via Firebase.
 
 ## Features
 
-- **Real-time Blocking Marks** - Click on the stage map to mark actor positions; supports drag adjustment, curved paths, and multi-select batch operations
-- **Dialogue Editing** - Double-click to edit lines; supports adding/deleting lines with real-time sync
-- **Notes System** - Add director's notes at precise character positions within dialogue (movement cues, performance notes, etc.)
-- **Multi-user Sync** - Built on Firebase Realtime Database for automatic multi-user synchronization
-- **Scene/Character Management** - Manage blocking by scene; switch between dialogue view and character view
-- **Version Management** - Save version snapshots and restore to any previous version
-- **PDF Export** - Export blocking notes as PDF with stage maps and dialogue side by side
-- **Stage Image Management** - Upload and manage multiple stage layouts; assign different layouts to different scenes
-- **Undo** - Ctrl+Z support for undoing blocking operations
+- **Real-time Blocking Marks** — Click on the stage layout to mark actor positions; supports drag, curved paths, and multi-select
+- **Dialogue Editing** — Double-click to edit lines; add/delete lines with real-time sync
+- **Notes System** — Add director's notes at precise positions within dialogue (movement cues, performance notes, etc.)
+- **Multi-user Sync** — Firebase Realtime Database for automatic multi-user synchronization (optional)
+- **Scene/Character Management** — Manage blocking by scene; switch between dialogue view and character view
+- **Version Management** — Save version snapshots and restore to any previous version
+- **PDF Export** — Export blocking notes as PDF with stage layouts and dialogue side by side
+- **Stage Image Management** — Upload and manage multiple stage layouts per scene
+- **Undo** — Ctrl+Z support for undoing blocking operations
 
-## Getting Started
+## Quick Start (No Firebase)
 
-1. **Configure Firebase**
-   - Create a Firebase project and enable Realtime Database
-   - Fill in your Firebase configuration in `js/config.js`
+The app works **without Firebase** in read-only mode — useful for trying it out or reviewing exported blocking notes.
 
-2. **Prepare Data**
-   - Edit the JSON files under `data/` with your script data
-   - `characters.json` - Character information
-   - `scenes.json` - Scene information
-   - `lines.json` - Dialogue data
+```bash
+# Clone the repo
+git clone https://github.com/Rice-Chinese-Theater-Club/stage-blocking-app.git
+cd stage-blocking-app
 
-3. **Add Stage Images**
-   - Place your stage layout images in the `stage-layouts/` directory
+# Serve with any static file server
+python3 -m http.server 8000
+# or: npx serve .
+```
 
-4. **Run Locally**
-   ```bash
-   # Use any static file server
-   python3 -m http.server 8000
-   # or
-   npx serve .
-   ```
-   Then visit `http://localhost:8000`
+Open `http://localhost:8000`. The app will load the sample data from `data/` and display it. You can browse scenes, view blocking marks, and export to PDF.
+
+**Limitations without Firebase:** Edits are not saved — any changes to blocking, notes, or lines are lost on page refresh. Multi-user sync is disabled.
+
+## Full Setup (with Firebase)
+
+To enable saving, real-time sync, and collaboration, you need a Firebase project.
+
+### Step 1: Create a Firebase Project
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Click **Add project** and follow the prompts
+3. In the project dashboard, click the **web icon** (`</>`) to register a web app
+4. Copy the `firebaseConfig` object from the setup screen
+
+### Step 2: Enable Realtime Database
+
+1. In your Firebase project, go to **Build → Realtime Database**
+2. Click **Create Database**
+3. Choose a location and start in **test mode** (you can lock down rules later)
+4. Your database URL will look like `https://your-project-id-default-rtdb.firebaseio.com`
+
+### Step 3: Configure the App
+
+Edit `js/config.js` and fill in your Firebase values:
+
+```javascript
+export const firebaseConfig = {
+    apiKey: "AIzaSy...",              // Required
+    authDomain: "myapp.firebaseapp.com",  // Required
+    databaseURL: "https://myapp-default-rtdb.firebaseio.com",  // Required
+    projectId: "myapp",              // Required
+    storageBucket: "myapp.appspot.com",   // Required
+    messagingSenderId: "123456789",  // Required
+    appId: "1:123456789:web:abc",    // Required
+    measurementId: "G-XXXXXXXXXX"    // Optional (analytics only)
+};
+```
+
+The other config fields:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `DRIVE_UPLOAD_URL` | No | Google Apps Script URL for uploading images to Google Drive. Leave as placeholder if not needed. |
+| `GITHUB_WORKFLOW_TOKEN` | No | GitHub PAT for triggering Actions workflows (data backup). Leave as placeholder if not needed. |
+| `GITHUB_REPO` | No | `org/repo` string for GitHub Actions integration. |
+| `features.*` | No | Feature flags to toggle search, GitHub sync, versions, and PDF export. |
+
+### Step 4: Run
+
+```bash
+python3 -m http.server 8000
+```
+
+Open `http://localhost:8000`. Blocking data now saves to Firebase automatically.
+
+## Preparing Your Script Data
+
+Edit the JSON files under `data/` to match your production. Only three files are required:
+
+### `characters.json`
+
+```json
+[
+  {
+    "id": "alice",
+    "name": "Alice",
+    "fullName": "Alice Chen",
+    "color": "#fde2e4"
+  }
+]
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | Yes | Unique identifier (used internally) |
+| `name` | Yes | Short display name (shown on stage layout markers) |
+| `fullName` | Yes | Full name (shown in character lists) |
+| `color` | Yes | Hex color for this character's markers and highlights |
+
+### `scenes.json`
+
+```json
+[
+  {
+    "id": "1-1",
+    "name": "Act 1 Scene 1",
+    "subtitle": "The arrival",
+    "stageMap": "act1/stage.png",
+    "characters": ["alice", "bob"]
+  }
+]
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | Yes | Unique scene identifier (e.g., `"1-1"`, `"2-3"`) |
+| `name` | Yes | Display name |
+| `subtitle` | No | Optional subtitle |
+| `stageMap` | No | Path to a stage layout image relative to `stage-layouts/` |
+| `characters` | No | Array of character `id`s in this scene |
+
+### `lines.json`
+
+```json
+[
+  {
+    "sceneId": "1-1",
+    "character": "alice",
+    "content": "Hello, is anyone there?",
+    "isStageDirection": false,
+    "lineNumber": 1
+  },
+  {
+    "sceneId": "1-1",
+    "character": null,
+    "content": "(Alice enters from stage left)",
+    "isStageDirection": true,
+    "lineNumber": null
+  }
+]
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `sceneId` | Yes | Which scene this line belongs to |
+| `character` | Yes* | Character `id` who speaks this line. `null` for stage directions. |
+| `content` | Yes | The dialogue text or stage direction |
+| `isStageDirection` | Yes | `true` for stage directions, `false` for spoken lines |
+| `lineNumber` | No | Line number for display. `null` for stage directions. |
+
+The other data files (`blockingData.json`, `dialogueEdits.json`, `lineOperations.json`, `sceneCharacters.json`, `versions.json`) are generated by the app at runtime via Firebase. You can leave them as empty objects `{}` or empty arrays `[]`.
+
+## Adding Stage Layouts
+
+Place your stage layout images in the `stage-layouts/` directory:
+
+```
+stage-layouts/
+├── default-blank.png      # Fallback blank stage
+├── layout_1.png           # Named layouts (selectable in-app)
+├── layout_2.png
+└── act1/
+    └── stage.png          # Per-act default (matched by scenes.json stageMap field)
+```
+
+Supported formats: PNG, JPG. Recommended size: 800×600 or similar landscape ratio.
 
 ## Tech Stack
 
 - HTML5 / CSS3 / JavaScript (ES Modules)
-- Firebase Realtime Database (v8 compat SDK)
+- Firebase Realtime Database (v8 compat SDK, loaded via CDN)
 - jsPDF + html2canvas (PDF export)
+- No build step — serve the directory as-is
 
-## Screenshots
+## License
 
-<!-- Add application screenshots here -->
-![Screenshot Placeholder](https://via.placeholder.com/800x450?text=Screenshot+Placeholder)
+[MIT](LICENSE)
