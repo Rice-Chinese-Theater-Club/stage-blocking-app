@@ -392,7 +392,7 @@ export function selectCharacter(lineId, charIndex) {
     BlockingApp.state.selectedCharIndex = charIndex;
 
     if (window.renderStageView) window.renderStageView();
-    showStatus(`已选择字符，请在走位图上点击标记移动位置`, 'info');
+    showStatus(`已选择字符，请在stage-layouts上点击标记移动位置`, 'info');
 }
 
 // 选择角色（角色视图中）

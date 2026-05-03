@@ -700,7 +700,7 @@ body {
     color: var(--text-secondary);
 }
 
-/* 右侧走位图 */
+/* 右侧stage-layouts */
 .stage-panel {
     flex: 1;
     display: flex;

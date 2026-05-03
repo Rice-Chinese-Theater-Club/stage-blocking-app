@@ -198,35 +198,35 @@ async function loadDialogueEdits() {
 }
 
 export async function loadStageImages() {
-    log('  🖼️ 加载走位图图片...');
+    log('  🖼️ 加载stage-layouts图片...');
 
     // 默认幕图（act1-4）
     const acts = ['1', '2', '3', '4'];
     const stageImages = {};
 
-    // 图片库列表（所有可用的走位图）
+    // 图片库列表（所有可用的stage-layouts）
     const libraryImages = [
-        { key: 'default_blank', name: '默认-空白', path: '走位图/默认-空白.png' },
-        { key: 'identity_1p_v1', name: 'layout_1', path: '走位图/layout_1.png' },
-        { key: 'identity_1p_v2', name: 'layout_2', path: '走位图/layout_2.png' },
-        { key: 'identity_4p_v1', name: 'layout_3', path: '走位图/layout_3.png' },
-        { key: 'identity_4p_v2', name: 'layout_4', path: '走位图/layout_4.png' },
-        { key: 'xiaolin', name: 'layout_5', path: '走位图/layout_5.png' },
-        { key: 'democracy', name: 'layout_6', path: '走位图/layout_6.png' },
-        { key: 'airplane', name: 'layout_7', path: '走位图/layout_7.png' },
-        { key: 'ktv', name: 'layout_8', path: '走位图/layout_8.png' },
-        { key: 'deep_travel_v1', name: 'layout_9', path: '走位图/layout_9.png' },
-        { key: 'deep_travel_v2', name: 'layout_10', path: '走位图/layout_10.png' },
-        { key: 'sweet_sour_bitter_spicy', name: 'layout_11', path: '走位图/layout_11.png' }
+        { key: 'default_blank', name: 'default-blank', path: 'stage-layouts/default-blank.png' },
+        { key: 'identity_1p_v1', name: 'layout_1', path: 'stage-layouts/layout_1.png' },
+        { key: 'identity_1p_v2', name: 'layout_2', path: 'stage-layouts/layout_2.png' },
+        { key: 'identity_4p_v1', name: 'layout_3', path: 'stage-layouts/layout_3.png' },
+        { key: 'identity_4p_v2', name: 'layout_4', path: 'stage-layouts/layout_4.png' },
+        { key: 'xiaolin', name: 'layout_5', path: 'stage-layouts/layout_5.png' },
+        { key: 'democracy', name: 'layout_6', path: 'stage-layouts/layout_6.png' },
+        { key: 'airplane', name: 'layout_7', path: 'stage-layouts/layout_7.png' },
+        { key: 'ktv', name: 'layout_8', path: 'stage-layouts/layout_8.png' },
+        { key: 'deep_travel_v1', name: 'layout_9', path: 'stage-layouts/layout_9.png' },
+        { key: 'deep_travel_v2', name: 'layout_10', path: 'stage-layouts/layout_10.png' },
+        { key: 'sweet_sour_bitter_spicy', name: 'layout_11', path: 'stage-layouts/layout_11.png' }
     ];
 
     // 加载默认幕图
     for (const act of acts) {
         try {
-            let response = await fetch(`走位图/act${act}/stage.png`);
+            let response = await fetch(`stage-layouts/act${act}/stage.png`);
             if (!response.ok) {
                 // 如果没有专门的幕图，使用默认空白图
-                response = await fetch('走位图/默认-空白.png');
+                response = await fetch('stage-layouts/default-blank.png');
             }
 
             if (response.ok) {
@@ -271,7 +271,7 @@ export async function loadStageImages() {
     }
 
     BlockingApp.data.stageImages = stageImages;
-    log(`  🖼️ 走位图加载完成，默认图 ${acts.length} 张，图片库 ${Object.keys(stageImages.library).length} 张`);
+    log(`  🖼️ stage-layouts加载完成，默认图 ${acts.length} 张，图片库 ${Object.keys(stageImages.library).length} 张`);
 }
 
 // 数据迁移：将"台下"(onStage: false)的角色改为未设定初始位置
@@ -577,11 +577,11 @@ export function loadStageMap(sceneIdOrMapFile) {
         } else {
             actNumber = '1';
         }
-        imageSrc = BlockingApp.data.stageImages?.[actNumber] || `走位图/act${actNumber}/stage.png`;
+        imageSrc = BlockingApp.data.stageImages?.[actNumber] || `stage-layouts/act${actNumber}/stage.png`;
     }
 
     wrapper.innerHTML = `
-        <img src="${imageSrc}" class="stage-image" id="stageImage" alt="走位图">
+        <img src="${imageSrc}" class="stage-image" id="stageImage" alt="stage-layouts">
         <svg class="stage-overlay" id="stageOverlay"></svg>
     `;
 

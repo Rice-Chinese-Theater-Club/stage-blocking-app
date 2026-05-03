@@ -338,7 +338,7 @@ function generateActDividerHTML(actName) {
     `;
 }
 
-// 生成走位图页 HTML（横向显示）
+// 生成stage-layouts页 HTML（横向显示）
 function generateStagePageHTML(scene, movements, pageInfo = null) {
     // 使用新的图片获取逻辑：优先场次配置，否则用该幕默认图
     let stageImageSrc = getStageImageForScene(scene.id);
@@ -346,7 +346,7 @@ function generateStagePageHTML(scene, movements, pageInfo = null) {
         // 回退到默认幕图
         const actNumber = getActFromSceneId(scene.id);
         const stageImages = BlockingApp.data.stageImages || {};
-        stageImageSrc = stageImages[actNumber] || `走位图/act${actNumber}/stage.png`;
+        stageImageSrc = stageImages[actNumber] || `stage-layouts/act${actNumber}/stage.png`;
     }
 
     // 舞台图尺寸（横向，适配纵向页面宽度）
@@ -531,7 +531,7 @@ export async function generatePDF() {
         const linePages = paginateLines(annotatedLines);  // 使用默认的30行
 
         scenePagesData.push({ scene, labeledMovements, annotatedLines, linePages });
-        totalPages += linePages.length * 2; // 每页台词对应一页走位图
+        totalPages += linePages.length * 2; // 每页台词对应一页stage-layouts
     }
 
     // 计算幕间分隔页数量
@@ -589,9 +589,9 @@ export async function generatePDF() {
                 );
                 previousEndPositions = endPositions;
 
-                // 走位图页 (偶数页，左边)
+                // stage-layouts页 (偶数页，左边)
                 currentPage++;
-                showStatus(`正在渲染 第 ${currentPage}/${totalPages} 页（${scene.id} 走位图）...`, 'info');
+                showStatus(`正在渲染 第 ${currentPage}/${totalPages} 页（${scene.id} stage-layouts）...`, 'info');
                 doc.addPage();
                 const stageHtml = generateStagePageHTML(scene, movements, pageInfo);
                 const stageCanvas = await renderToCanvas(stageHtml, PAGE_WIDTH, PAGE_HEIGHT, container);

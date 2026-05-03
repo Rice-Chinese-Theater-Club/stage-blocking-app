@@ -120,7 +120,7 @@ export function confirmInitialCharacter() {
 
     // 进入位置选择模式
     BlockingApp.state.settingInitial = true;
-    showStatus(`为 ${pendingInitialCharacter} 设置初始位置：请在走位图上点击`, 'info');
+    showStatus(`为 ${pendingInitialCharacter} 设置初始位置：请在stage-layouts上点击`, 'info');
 }
 
 // 处理舞台点击
@@ -1550,7 +1550,7 @@ export function deleteMarkerOnStage(x, y, charName, isStart) {
 // 开始添加自由走位
 export function startAddFreeMovement() {
     BlockingApp.state.addingFreeMovement = true;
-    showStatus('自由走位模式：请在走位图上点击添加位置', 'info');
+    showStatus('自由走位模式：请在stage-layouts上点击添加位置', 'info');
 }
 
 // 添加自由走位

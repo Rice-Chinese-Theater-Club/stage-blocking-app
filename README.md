@@ -31,7 +31,7 @@ Online Stage Blocking Notes is a web-based system for recording stage blocking i
    - `lines.json` - Dialogue data
 
 3. **Add Stage Images**
-   - Place your stage layout images in the `走位图/` directory
+   - Place your stage layout images in the `stage-layouts/` directory
 
 4. **Run Locally**
    ```bash
